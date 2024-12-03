@@ -47,16 +47,35 @@ const App = () => {
         name: newName,
         number: number,
       };
-      peopleService.create(newPerson).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setMessage(`Added ${returnedPerson.name}`);
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-        setClassN('success');
-        setNewName('');
-        setNumber('');
-      });
+      peopleService
+        .create(newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setMessage(`Added ${returnedPerson.name}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+          setClassN('success');
+          setNewName('');
+          setNumber('');
+        })
+        .catch((error) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.error
+          ) {
+            console.log(error.response.data.error.message);
+
+            setMessage(error.response.data.error.message);
+          } else {
+            setMessage('An unexpected error occurred');
+          }
+          setClassN('error');
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        });
     }
 
     if (foundDuplicate.number != number) {
@@ -79,15 +98,27 @@ const App = () => {
           setNewName('');
           setNumber('');
         })
-        .catch(
-          setMessage(
-            `Information of ${updatedPerson.name} has already been removed from the server`
-          ),
-          setClassN('error'),
-          setTimeout(() => {
-            setMessage(null);
-          }, 5000)
-        );
+        .catch((error) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.error
+          ) {
+            setMessage('Invalid Number');
+            setClassN('error');
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
+          } else {
+            setMessage(
+              `Information of ${updatedPerson.name} has already been removed from the server`
+            ),
+              setClassN('error'),
+              setTimeout(() => {
+                setMessage(null);
+              }, 5000);
+          }
+        });
     }
   };
 
